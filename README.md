@@ -4,20 +4,16 @@ A tiny terminal environment checker for shells, CLI tools, developer tools, and 
 
 No installation.
 
-No dependencies beyond a POSIX-ish shell and standard system utilities.
+No dependencies beyond Bash and standard system utilities.
 
-## Quick Test
+## Quick Start
 
-Run directly:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/nihitdev/dotfiles-check/main/dotcheck.sh | bash
-```
-
-Or inspect the script first:
+Clone and run locally:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/nihitdev/dotfiles-check/main/dotcheck.sh
+git clone https://github.com/nihitdev/dotfiles-check.git
+cd dotfiles-check
+./dotcheck.sh
 ```
 
 ## What Does "Current Shell" Mean?
@@ -31,10 +27,10 @@ Login shell: /usr/bin/fish
 Running:     fish
 ```
 
-If you run the zero-install command:
+The checker has a Bash shebang, so running:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/nihitdev/dotfiles-check/main/dotcheck.sh | bash
+./dotcheck.sh
 ```
 
 the script is executed by Bash, so you may see:
@@ -47,17 +43,10 @@ Running:     bash
 That is expected.
 
 
-## Clone
+Show only missing commands:
 
 ```sh
-git clone https://github.com/nihitdev/dotfiles-check.git
-cd dotfiles-check
-```
-
-Then:
-
-```sh
-./dotcheck.sh
+./dotcheck.sh --missing-only
 ```
 
 ## What It Checks
@@ -160,11 +149,7 @@ The goal is to show what is available, not tell you what you must install.
 dotfiles-check/
 ├── README.md
 ├── LICENSE
-├── dotcheck.sh
-└── checks/
-    ├── commands.sh
-    ├── environment.sh
-    └── shell.sh
+└── dotcheck.sh
 ```
 
 ## Philosophy
@@ -182,6 +167,21 @@ This project intentionally avoids:
 It checks.
 
 You decide.
+
+## Development
+
+Run the local checks with:
+
+```sh
+bash -n dotcheck.sh tests/*.sh
+shellcheck dotcheck.sh tests/*.sh
+./tests/test-dotcheck.sh
+git diff --check
+```
+
+Tests replace `HOME` and `PATH` with isolated temporary fixtures. They do not
+install tools or modify shell configuration. GitHub Actions runs the same
+syntax, behavior, and whitespace checks.
 
 ## Related
 

@@ -1,9 +1,42 @@
 #!/usr/bin/env bash
 
-set -u
+set -Eeuo pipefail
 
 TOTAL=0
 PASSED=0
+MISSING_ONLY=false
+
+usage() {
+    printf '%s\n' \
+        'Usage: ./dotcheck.sh [OPTION]' \
+        '' \
+        'Inspect common shell, CLI, development, and environment settings.' \
+        '' \
+        'Options:' \
+        '  --missing-only  Show only commands that are not installed' \
+        '  -h, --help      Show this help'
+}
+
+if (($# > 1)); then
+    printf 'dotcheck: expected at most one option\n' >&2
+    usage >&2
+    exit 2
+fi
+
+if (($# == 1)); then
+    case "$1" in
+        --missing-only) MISSING_ONLY=true ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            printf 'dotcheck: unknown option: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+fi
 
 check_command() {
     local command_name="$1"
@@ -12,8 +45,10 @@ check_command() {
     TOTAL=$((TOTAL + 1))
 
     if command -v "$command_name" >/dev/null 2>&1; then
-        printf "  ✓  %-18s installed\n" "$display_name"
         PASSED=$((PASSED + 1))
+        if [[ $MISSING_ONLY == false ]]; then
+            printf "  ✓  %-18s installed\n" "$display_name"
+        fi
     else
         printf "  ✗  %-18s missing\n" "$display_name"
     fi
@@ -35,6 +70,10 @@ check_command zsh "Zsh"
 check_command bash "Bash"
 check_command starship "Starship"
 check_command zoxide "zoxide"
+
+section "Current Shell"
+printf "  %-14s %s\n" "Login shell:" "${SHELL:-unknown}"
+printf "  %-14s %s\n" "Running:" "bash"
 
 section "CLI"
 
